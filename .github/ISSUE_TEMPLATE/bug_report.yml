@@ -1,0 +1,154 @@
+name: "\U0001F41E Bug report"
+description: Something in the firmware behaves differently than documented.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Before you start:** if the pedal is silent, distorting, or one frequency band is dead,
+        that is far more often an analog or assembly fault than a firmware bug. The
+        [product page](https://zeppelindesignlabs.com/products/quaverato-harmonic-tremolo-pedal-diy-kit)
+        and the [assembly guide](https://docs.zeppelindesignlabs.com/quaverato/)
+        are the right first stop. Open an issue
+        here when the behaviour is clearly digital: LFO timing, MIDI, presets, bypass switching,
+        or boot modes.
+
+  - type: input
+    id: firmware-version
+    attributes:
+      label: Firmware version
+      description: >-
+        Power the pedal off, hold the TAP footswitch, power it on and keep holding.
+        The tap LED blinks out three digits, short pulses for each digit and one long
+        pulse for a zero. If you flashed it yourself, give the tag or commit.
+      placeholder: "2.5.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: midi-mod
+    attributes:
+      label: Is the MIDI mod installed?
+      options:
+        - "Yes, MIDI board fitted"
+        - "No, non-MIDI pedal"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provenance
+    attributes:
+      label: How did you get the pedal?
+      options:
+        - "Bought assembled from Zeppelin Design Labs"
+        - "Built from a Zeppelin kit"
+        - "Built from scratch or on my own board"
+        - "Bought secondhand"
+    validations:
+      required: true
+
+  - type: input
+    id: serial
+    attributes:
+      label: Serial number
+      description: >-
+        On the bottom plate. Optional, but it tells us which board revision you have.
+        ZD3672 and up shipped MIDI-ready.
+      placeholder: "ZD4211"
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the actual behaviour.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      description: >-
+        If the owner's manual or something in docs/ says different from what the pedal does,
+        quote it here. That makes the fix unambiguous.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Please be specific enough that someone else can follow along on their own pedal.
+      placeholder: |
+        1. Power on with no switches held
+        2. Set MULTIPLIER to 1:1, WAVE SHAPE to square
+        3. Tap the TAP footswitch four times at roughly 120 BPM
+        4. Turn HARMONIC MIX fully clockwise
+        5. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: control-positions
+    attributes:
+      label: Control positions
+      description: >-
+        Knob positions (clock face is fine), both toggle switch positions, and the internal
+        DIP switch settings if you have changed them from the factory 400 Hz / 600 Hz crossover.
+      placeholder: |
+        DEPTH 3:00, MULTIPLIER 1:1, WAVE SHAPE sine, RATE 12:00,
+        SPACING 12:00, HARMONIC MIX fully CCW, VOLUME 12:00
+        PHASE: OUT (harmonic)   MODE: TOG
+    validations:
+      required: false
+
+  - type: textarea
+    id: midi-details
+    attributes:
+      label: MIDI details
+      description: >-
+        Only if the bug involves MIDI. Which controller, which channel, and the exact messages
+        sent (CC numbers and values, program change numbers, whether beat clock is running).
+    validations:
+      required: false
+
+  - type: dropdown
+    id: programmer
+    attributes:
+      label: How was this firmware flashed?
+      options:
+        - "Factory, I have not reflashed it"
+        - "ZDL Updater app"
+        - "USBtiny and avrdude"
+        - "Other ISP programmer"
+        - "Not sure"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: >-
+        Audio or video of the problem is enormously helpful for anything rate, timing or tone
+        related. Drag files in here.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and the Zeppelin Design Labs forums for this problem.
+          required: true
+        - label: >-
+            I have read enough of the manual to be reasonably confident this is a firmware
+            behaviour, not an analog fault or a calibration issue.
+          required: true

@@ -1,0 +1,126 @@
+name: "\u2728 Feature proposal"
+description: A specific, scoped change you have thought through.
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Start on the [forums](https://forums.zeppelindesignlabs.com), not here.**
+        Questions, ideas and feature requests belong on the Zeppelin Design Labs forums. We
+        promote a thread to a GitHub issue when we decide to build it. Use this form only if a
+        maintainer asked you to, or you are turning an agreed forum thread into a tracked task.
+
+        ### What the hardware can and cannot do
+
+        The ATmega328P **never sees your audio**. It only drives the two optocoupler LEDs with PWM,
+        and the entire signal path is analog. That permanently rules out, regardless of how clever
+        the code is:
+
+        - envelope followers, auto-wah, or anything reacting to playing dynamics
+        - pitch tracking or pitch shifting
+        - delay, reverb, or any effect needing a buffer of audio
+        - stereo output, because there is one output jack
+        - MIDI out or MIDI thru, because the UART transmit pin is wired to the bypass footswitch,
+          so the pedal can receive MIDI but has no way to send it
+
+        What **is** available: anything to do with the LFO (shape, rate, phase, depth, how the two
+        bands relate to each other), the footswitches and boot-time gestures, preset storage, the
+        LEDs, and MIDI input handling.
+
+        Please also skim [ROADMAP.md](https://github.com/ZeppelinDesignLabs/quaverato-firmware/blob/main/ROADMAP.md).
+        It may already be planned.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences. What should the pedal do that it does not do now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: What problem does this solve?
+      description: >-
+        The musical situation, not the implementation. What are you trying to play, and what
+        stops you? This is the part that decides whether a feature gets built, so it is worth
+        more words than the proposal itself.
+    validations:
+      required: true
+
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Proposed behaviour
+      description: >-
+        How would it actually work in use? If it needs a new parameter, say what range it has
+        and what the endpoints sound like.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: control-surface
+    attributes:
+      label: How should the player reach it?
+      description: >-
+        The panel is full. Six knobs, two toggles, two footswitches, all already assigned.
+        Anything new has to share.
+      multiple: true
+      options:
+        - "MIDI CC only"
+        - "A shift layer (hold a footswitch, knobs address a second set of parameters)"
+        - "A boot-time gesture (hold switches while powering on)"
+        - "Reuse an existing control in a mode where it is currently idle"
+        - "Replace or change an existing control's behaviour"
+        - "I do not know, that is part of what I would like to discuss"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: software-only
+    attributes:
+      label: Can this be done in firmware alone?
+      description: See the hardware notes at the top of this form.
+      options:
+        - "Yes, firmware only"
+        - "No, it would need a hardware change too"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: >-
+        Including "I currently work around this by ...". Existing workarounds tell us how much
+        the feature is really worth.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: participation
+    attributes:
+      label: Would you like to work on this?
+      options:
+        - "I am just proposing the idea"
+        - "I could help test on my own pedal"
+        - "I would like to implement it myself"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and the Zeppelin Design Labs forums for this idea.
+          required: true
+        - label: I checked ROADMAP.md and this is not already planned.
+          required: true
+        - label: >-
+            I understand this is firmware for existing hardware, and that changes must keep
+            working on pedals already in the field.
+          required: true

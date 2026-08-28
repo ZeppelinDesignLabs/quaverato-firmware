@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup arduino-cli
+        uses: arduino/setup-arduino-cli@v2
+
+      # Compiling through the profile is deliberate: it makes
+      # Quaverato/sketch.yaml the only place versions are pinned, and it means
+      # CI fails if the profile itself breaks rather than only the FQBN.
+      - name: Compile
+        working-directory: firmware
+        run: |
+          mkdir -p build
+          arduino-cli compile --profile minicore --build-path "$PWD/build" Quaverato
+          echo "=== Flash usage ==="
+          find build -name '*.elf' -exec sh -c 'avr-size -A "$1" 2>/dev/null || true' _ {} \;
+          HEX=$(find build -name 'Quaverato.ino.hex' | head -1)
+          cp "$HEX" build/Quaverato.hex
+          python3 - <<'PY'
+          mem={}
+          for line in open("build/Quaverato.hex"):
+              line=line.strip()
+              if not line.startswith(":"): continue
+              b=bytes.fromhex(line[1:])
+              n,addr,typ=b[0],(b[1]<<8)|b[2],b[3]
+              if typ==0:
+                  for i in range(n): mem[addr+i]=b[4+i]
+          print("flash_bytes=%d" % len(mem))
+          PY
+
+      - name: Upload hex artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quaverato-firmware
+          path: firmware/build/Quaverato.hex

@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse version from tag
+        id: ver
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify version.h matches tag
+        run: |
+          MAJOR=$(grep 'VERSION_MAJOR' firmware/Quaverato/src/version.h | grep -oE '[0-9]+')
+          MINOR=$(grep 'VERSION_MINOR' firmware/Quaverato/src/version.h | grep -oE '[0-9]+')
+          PATCH=$(grep 'VERSION_PATCH' firmware/Quaverato/src/version.h | grep -oE '[0-9]+')
+          EXPECTED="${MAJOR}.${MINOR}.${PATCH}"
+          TAG_VER="${{ steps.ver.outputs.version }}"
+          # Allow archived tags (1.1.3, 2.3.6, 2.4.2) without matching version.h
+          case "$TAG_VER" in
+            1.1.3|2.3.6|2.4.2)
+              echo "Archived tag $TAG_VER — skip version.h check"
+              ;;
+            *)
+              if [ "$EXPECTED" != "$TAG_VER" ]; then
+                echo "version.h is $EXPECTED but tag is $TAG_VER"
+                exit 1
+              fi
+              ;;
+          esac
+
+      - name: Setup arduino-cli
+        if: ${{ steps.ver.outputs.version != '1.1.3' && steps.ver.outputs.version != '2.3.6' && steps.ver.outputs.version != '2.4.2' }}
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Build modern release
+        if: ${{ steps.ver.outputs.version != '1.1.3' && steps.ver.outputs.version != '2.3.6' && steps.ver.outputs.version != '2.4.2' }}
+        working-directory: firmware
+        run: |
+          mkdir -p dist
+          arduino-cli compile --profile minicore --build-path "$PWD/build" Quaverato
+          HEX=$(find build -name 'Quaverato.ino.hex' | head -1)
+          cp "$HEX" "dist/Quaverato-${{ steps.ver.outputs.version }}.hex"
+          sha256sum "dist/Quaverato-${{ steps.ver.outputs.version }}.hex" | tee "dist/Quaverato-${{ steps.ver.outputs.version }}.hex.sha256"
+          cp ../eeprom/quaverato-default-presets.hex dist/
+
+      - name: Package archived release assets
+        if: ${{ steps.ver.outputs.version == '1.1.3' || steps.ver.outputs.version == '2.3.6' || steps.ver.outputs.version == '2.4.2' }}
+        run: |
+          VER="${{ steps.ver.outputs.version }}"
+          mkdir -p dist
+          cp "archive/v${VER}/"* dist/ || cp Quaverato_${VER}.ino Quaverato_${VER}.ino.hex dist/ || true
+          cp eeprom/quaverato-default-presets.hex dist/ 2>/dev/null || cp quaveratoeeprom.hex dist/ || true
+          (cd dist && sha256sum * > checksums.sha256)
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          body: |
+            Firmware release `${{ steps.ver.outputs.tag }}`.
+
+            For archived 1.x/2.3.6/2.4.2 builds, assets are the original field-verified `.hex` files (not rebuilt).
+            See `docs/releases.md` and `docs/build-environment.md`.

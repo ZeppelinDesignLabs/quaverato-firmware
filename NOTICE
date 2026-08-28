@@ -1,0 +1,18 @@
+# Notices
+
+## Wavetable data
+
+Files under `firmware/Quaverato/src/wavetables/` (and the historical `wavetables/` copies)
+contain 256-byte waveform tables originally published by Robert W. Gallup
+(www.robertgallup.com), Copyright (c) 2013, under the MIT License.
+
+The sine table used by Quaverato has been modified from the stock Gallup table;
+preserve it byte-for-byte when relocating sources.
+
+The MIT license text is included in each header file and must be retained in
+all copies or substantial portions.
+
+## Quaverato firmware
+
+Unless otherwise noted, Quaverato firmware source in this repository is
+licensed under the GNU General Public License v3.0 — see `LICENSE`.

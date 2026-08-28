@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "Questions, ideas, and feature requests"
+    url: https://forums.zeppelindesignlabs.com
+    about: Ask, discuss, and propose features on the Zeppelin Design Labs forums. GitHub Issues are for firmware bugs we intend to fix.
+
+  - name: "Support hub"
+    url: https://zeppelindesignlabs.com/pages/support
+    about: Documentation, contact, forums, and product help in one place.
+
+  - name: "Assembly guide"
+    url: https://docs.zeppelindesignlabs.com/quaverato/
+    about: Step-by-step kit build for board V8.2 / serial ZD3672+.
+
+  - name: "Quaverato product page"
+    url: https://zeppelindesignlabs.com/products/quaverato-harmonic-tremolo-pedal-diy-kit
+    about: Kit details, downloads, and product documentation.

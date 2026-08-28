@@ -1,0 +1,15 @@
+# LF on Windows and WSL so the same checkout is clean on both sides.
+* text=auto eol=lf
+
+# Archived field hexes stay byte-identical (checksums in docs/releases.md).
+archive/** -text
+
+# Explicit binaries (git's text=auto usually guesses these; keep them honest).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.bin binary
+*.eep binary
+*.elf binary
