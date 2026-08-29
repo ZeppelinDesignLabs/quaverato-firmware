@@ -1,7 +1,22 @@
 # LF on Windows and WSL so the same checkout is clean on both sides.
 * text=auto eol=lf
 
-# Archived field hexes stay byte-identical (checksums in docs/releases.md).
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.ino text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.ini text eol=lf
+*.txt text eol=lf
+*.hex text eol=lf
+
+# Last match wins: archived field hexes stay byte-identical (docs/releases.md).
 archive/** -text
 
 # Explicit binaries (git's text=auto usually guesses these; keep them honest).

@@ -122,6 +122,6 @@ Hardware-facing changes (LFO, relay, boot gestures) need a real-pedal test note 
 
 ## Preferred environment
 
-Developers on Windows may use Windows Git or WSL2 on the same checkout. `.gitattributes` forces LF for text (`* text=auto eol=lf`) so `git status` matches on both sides. `.editorconfig` and `.vscode/settings.json` keep the editor on LF too. Do not set `core.autocrlf` to paper over a dirty tree. Archived hexes under `archive/` stay byte-identical. Shell scripts in `tools/` must stay LF.
+Developers on Windows may use Windows Git or WSL2 on the same checkout. `.gitattributes` forces LF for text so `git status` matches on both sides. `.editorconfig` and `.vscode/settings.json` keep the editor on LF. This repo should use `core.autocrlf=false` and `core.eol=lf` (attributes already force LF; do not set `autocrlf=true` to hide a dirty tree). PlatformIO rewrites `firmware/.vscode/extensions.json` on Windows with CRLF — that file is gitignored; the recommendation lives in `.vscode/extensions.json`. Archived hexes under `archive/` stay byte-identical. Shell scripts in `tools/` must stay LF.
 
 End-user and editor setup (Arduino IDE, VS Code / Cursor / Kiro, PlatformIO, release hex) is specified in `docs/getting-started.md`, not here.

@@ -3,3 +3,5 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+# PIO rewrites this on Windows with CRLF; root .vscode/extensions.json stays tracked.
+.vscode/extensions.json
