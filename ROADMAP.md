@@ -88,6 +88,20 @@ the foundation that makes the features after it cheap instead of impossible.
       256 bytes, so the ceiling is somewhere around sixty additional shapes. Which ones are worth
       having is a good topic for the forums.
 
+- [ ] **Opt-in dim tap LED in bypass.** The tap LED keeps PWM-ing at the LFO rate when the
+      effect is off so you can still set tempo. That current shares ground with the jacks, so a
+      high-gain amp or dirt in the chain can pick up a faint tick or static in time with the
+      tempo. Isolated 9 V does not fix it: the loop is inside the pedal and out the guitar cable.
+      Parking the optocouplers did nothing audible. Dropping the tap LED to about 1/8 brightness
+      in bypass (same waveform) made the pulse essentially disappear on the bench, with tempo
+      still visible.
+
+      Must stay **off by default**. Most players want a bright tap LED in bypass. A field unit
+      on a hot gain stage is the reason to turn it on. Unused EEPROM address 4 can hold the
+      flag (`1` = dim, `0` / `0xFF` = factory bright) so a one-byte hex can enable it without
+      touching presets. Do not make it the shipping default. Pre-8.2 boards still need the
+      isolator-net check before they take current firmware.
+
 ---
 
 ## Later: not scheduled, not rejected
