@@ -7,8 +7,12 @@
 #include "eeprom_map.h"
 #include "pins.h"
 #include "state.h"
-#include "tasks.h"
 #include "oscillator.h"
+
+static unsigned long presetArmAt = 0;
+static unsigned long presetBlinkAt = 0;
+static bool presetArmed = false;
+static bool presetBlinking = false;
 
 // Matches eeprom/quaverato-default-presets.hex. Used only when the schema byte
 // is neither current nor the legacy 0x00 / 0xFF "same layout" markers.
@@ -42,6 +46,32 @@ void ensureEepromSchema() {
   EEPROM.update(EEPROM_ADDR_SCHEMA, EEPROM_SCHEMA_VERSION);
 }
 
+void armPresetStore() {
+  presetArmed = true;
+  presetBlinking = false;
+  presetArmAt = micros() + 5000000UL;
+}
+
+void cancelPresetStore() {
+  presetArmed = false;
+  presetBlinking = false;
+}
+
+void servicePreset() {
+  if (presetArmed && (long)(micros() - presetArmAt) >= 0) {
+    presetArmed = false;
+    presetBlinking = true;
+    presetBlinkAt = micros();
+  }
+  if (presetBlinking && (long)(micros() - presetBlinkAt) >= 20000) {
+    presetBlinkAt = micros();
+    presetMode();
+    if (!presetModeFlag) {
+      presetBlinking = false;
+    }
+  }
+}
+
 void presetMode() {
   static bool blinkLight = false;
   presetModeFlag = true;
@@ -50,7 +80,7 @@ void presetMode() {
   if (digitalRead(switch_pin_Bypass) == HIGH) {
     writePreset(timeDivision - 1);
     presetModeFlag = false;
-    storePreset.disable();
+    cancelPresetStore();
   }
 }
 

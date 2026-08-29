@@ -27,12 +27,10 @@ unbounded `clockCount`, tap LED PWM at 490 Hz, and an EEPROM schema byte. See
 This is a rewrite of how the LFO works. Nothing here is a user-visible feature on its own. It is
 the foundation that makes the features after it cheap instead of impossible.
 
-- [ ] **Replace the scheduler-driven wavetable stepper with a DDS phase accumulator in a timer
-      interrupt.** Today the LFO advances one step per TaskScheduler callback, and `analogRead()`
-      blocks for roughly 104 microseconds from that same cooperative scheduler. At the fastest
-      rates the oscillator wants to step every 196 microseconds, so control polling lands
-      unpredictably inside a large fraction of a step period. A 32-bit phase accumulator driven by
-      hardware makes the rate exact and the timing jitter-free.
+- [ ] **Replace the interval stepper with a DDS phase accumulator.** The LFO already runs from
+      the Timer1 overflow ISR (TaskScheduler is gone). It still advances one wavetable index
+      when an interval elapses. A 32-bit phase accumulator driven by those overflows makes the
+      rate exact and the timing jitter-free.
 
       *Open question: the interrupt cost needs measuring on real hardware before we commit to an
       update rate. If it is too tight, updating every 2nd or 4th PWM overflow is the tuning knob.*

@@ -5,6 +5,8 @@ void flipRelay();
 void flipRelayPartTwo();
 void resetRelay();
 void disableIsolator();
+void armMidiMomentary();
 void midiMomentRelay();
+void serviceRelay();
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef QUAVERATO_CONTROLS_H
 #define QUAVERATO_CONTROLS_H
 
+void serviceControls();
 void functionSwitch();
 void phaseSwitch();
 void modeSwitch();

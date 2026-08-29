@@ -1,12 +1,9 @@
-#define _TASK_MICRO_RES
-
 #include <EEPROM.h>
 
 #include "src/version.h"
 #include "src/pins.h"
 #include "src/eeprom_map.h"
 #include "src/state.h"
-#include "src/tasks.h"
 #include "src/wavetables.h"
 #include "src/oscillator.h"
 #include "src/controls.h"
@@ -14,27 +11,6 @@
 #include "src/relay.h"
 #include "src/presets.h"
 #include "src/boot.h"
-
-// Forward-declare Task callbacks before Task construction
-void stepWaveform();
-void functionSwitch();
-void flipRelayPartTwo();
-void resetRelay();
-void disableIsolator();
-void handleMIDI();
-void presetMode();
-void midiMomentRelay();
-
-Scheduler ts;
-
-Task oscillator(784, TASK_FOREVER, &stepWaveform, &ts);
-Task checkControls(4000, TASK_FOREVER, &functionSwitch, &ts);
-Task relayPartTwo(TASK_IMMEDIATE, TASK_FOREVER, &flipRelayPartTwo, &ts);
-Task relayCleanup(TASK_IMMEDIATE, TASK_FOREVER, &resetRelay, &ts);
-Task relayDisableIsolator(TASK_IMMEDIATE, TASK_FOREVER, &disableIsolator, &ts);
-Task updateMidi(160, TASK_FOREVER, &handleMIDI, &ts);
-Task storePreset(20000, TASK_FOREVER, &presetMode, &ts);
-Task midiMomentaryMode(TASK_IMMEDIATE, TASK_FOREVER, &midiMomentRelay, &ts);
 
 void setup() {
   // Timer1 (pins 9/10 opto LEDs): phase-correct 8-bit, prescaler 1 → ~31.25 kHz.
@@ -82,11 +58,13 @@ void setup() {
   loadMidiChannelFromEeprom();
   setupMidi(midiChannel);
 
-  oscillator.enable();
-  checkControls.enable();
-  updateMidi.enable();
+  setupOscillator();
+  enableOscillator();
 }
 
 void loop() {
-  ts.execute();
+  handleMIDI();
+  serviceControls();
+  serviceRelay();
+  servicePreset();
 }

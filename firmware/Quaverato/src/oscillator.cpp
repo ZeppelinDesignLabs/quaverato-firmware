@@ -1,22 +1,68 @@
 #include "oscillator.h"
 
+#include <avr/interrupt.h>
+#include <util/atomic.h>
+
 #include "pins.h"
 #include "state.h"
-#include "tasks.h"
 #include "wavetables.h"
+
+// Timer1 phase-correct 8-bit, prescaler 1: overflow period is 510 / 16 MHz =
+// 31.875 µs. Tick units are eighths of a microsecond so that period is exact
+// (255/8). The LFO still advances one wavetable step at a time; DDS replaces
+// this interval logic next.
+static const uint16_t TICKS_PER_OVF = 255;
+static volatile bool lfoRunning = false;
+static volatile uint32_t tickAccum = 0;
+static volatile uint32_t intervalTicks = 784UL * 8;
+
+static uint32_t intervalToTicks(unsigned long us) {
+  if (us == 0) {
+    us = 1;
+  }
+  return us * 8UL;
+}
+
+static void latchIntervalFromStep() {
+  const unsigned long us =
+      (waveFormStep < 128) ? firstHalfStepRate : secondHalfStepRate;
+  intervalTicks = intervalToTicks(us);
+}
+
+void setupOscillator() {
+  latchIntervalFromStep();
+  TIMSK1 |= _BV(TOIE1);
+}
+
+void enableOscillator() {
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    latchIntervalFromStep();
+    lfoRunning = true;
+  }
+}
+
+void disableOscillator() {
+  lfoRunning = false;
+}
 
 void stepWaveform() {
   light(pgm_read_byte_near(waveTable[currentWaveTable] + waveFormStep));
   waveFormStep++;
-  if (waveFormStep < 128) {
-    if (!followMidiClock || waveFormStep == 0) {
-      oscillator.setInterval(firstHalfStepRate);
-    }
+  if (!followMidiClock || waveFormStep == 0 || waveFormStep == 128) {
+    latchIntervalFromStep();
   }
-  if (waveFormStep >= 128) {
-    if (!followMidiClock || waveFormStep == 128) {
-      oscillator.setInterval(secondHalfStepRate);
-    }
+}
+
+ISR(TIMER1_OVF_vect) {
+  if (!lfoRunning) {
+    return;
+  }
+  tickAccum += TICKS_PER_OVF;
+  uint8_t steps = 0;
+  while (tickAccum >= intervalTicks && steps < 4) {
+    tickAccum -= intervalTicks;
+    stepWaveform();
+    steps++;
   }
 }
 
@@ -58,13 +104,20 @@ unsigned long applyTapDivision(unsigned long rate) {
 
 void setTempo() {
   splitDutyCycle(dutyCycle, applyTapDivision(stepRate));
-  oscillator.enable();
+  enableOscillator();
 }
 
 void splitDutyCycle(double duty, unsigned long rate) {
   if (!synchronize) {
     rate *= 2;
   }
-  firstHalfStepRate = 2 * rate * duty;
-  secondHalfStepRate = 2 * rate * (1 - duty);
+  const unsigned long first = 2 * rate * duty;
+  const unsigned long second = 2 * rate * (1 - duty);
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    firstHalfStepRate = first;
+    secondHalfStepRate = second;
+    if (!followMidiClock) {
+      latchIntervalFromStep();
+    }
+  }
 }

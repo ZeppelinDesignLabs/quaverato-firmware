@@ -6,5 +6,8 @@ void readPreset(int presetNumber);
 void writePreset(int presetNumber);
 void ensureEepromSchema();
 void restoreFactoryPresets();
+void armPresetStore();
+void cancelPresetStore();
+void servicePreset();
 
 #endif

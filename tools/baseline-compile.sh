@@ -33,7 +33,10 @@ mkdir -p "$BUILD/Quaverato"
 cp "$SRC" "$BUILD/Quaverato/Quaverato.ino"
 cp "$REPO/firmware/Quaverato/src/wavetables/"*.h "$BUILD/Quaverato/"
 
-# 2.x archived sketches still include <EEPROMex.h>. Current firmware does not.
+# Archived sketches still include TaskScheduler / EEPROMEx. Current firmware does not.
+if grep -q 'TaskScheduler.h' "$SRC"; then
+  arduino-cli lib install "TaskScheduler@4.0.8" >/dev/null
+fi
 if grep -q 'EEPROMex.h' "$SRC"; then
   arduino-cli lib install "EEPROMEx@1.0.0" >/dev/null
 fi

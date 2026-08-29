@@ -6,7 +6,6 @@
 
 #include "eeprom_map.h"
 #include "state.h"
-#include "tasks.h"
 #include "oscillator.h"
 #include "relay.h"
 #include "presets.h"
@@ -195,13 +194,13 @@ void handleNoteOn(byte channel, byte note, byte velocity) {
   if (velocity == 0) {
     handleNoteOff(channel, note, velocity);
   } else if (!relayON) {
-    midiMomentaryMode.enableDelayed(20000);
+    armMidiMomentary();
   }
 }
 
 void handleNoteOff(byte channel, byte note, byte velocity) {
   if (relayON) {
-    midiMomentaryMode.enableDelayed(20000);
+    armMidiMomentary();
   }
 }
 
@@ -229,19 +228,18 @@ void handleStart() {
     buttonTimer = micros();
     // Continuous tableShift invert is applied in light(); always start at phase 0
     waveFormStep = 0;
-    oscillator.setInterval(firstHalfStepRate);
-    oscillator.enable();
+    enableOscillator();
   }
 }
 
 void handleStop() {
   if (followMidiClock) {
-    oscillator.disable();
+    disableOscillator();
   }
 }
 
 void handleContinue() {
   if (followMidiClock) {
-    oscillator.enable();
+    enableOscillator();
   }
 }

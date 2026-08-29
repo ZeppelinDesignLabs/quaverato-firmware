@@ -16,7 +16,7 @@ License: **GPL-3.0** (`LICENSE`). Wavetable data is **MIT** (see `NOTICE`). Do n
 - Claim byte-identical reproduction of pre-2.5.1 shipping `.hex` files (different original toolchains).
 - Enable MIDI thru or drive UART TX — digital pin **1** is the bypass footswitch *and* UART TX; `MIDI.turnThruOff()` is required.
 - Include `wavetables/*.h` data headers from more than one translation unit (`wavetables.cpp` only).
-- Include the full `<TaskScheduler.h>` from more than one `.cpp` (`src/ts.cpp` only; others use `TaskSchedulerDeclarations.h` via `tasks.h`).
+- Drive the LFO from the Timer1 overflow ISR only. Do not put `analogRead()` or other blocking work in that ISR.
 - Paste copyrighted Owner’s Manual / Assembly Instructions prose into `docs/`. Document interface facts from source instead.
 - Tell anyone to **Burn Bootloader**, run `pio run -t fuses`, or run `pio run -t bootloader`. Those write fuse bytes. The wrong clock fuse bricks ISP until an external clock is supplied.
 - Reintroduce **EEPROMEx**. Use the AVR core `EEPROM` library (`update` / `get` / `put`).
@@ -27,7 +27,7 @@ License: **GPL-3.0** (`LICENSE`). Wavetable data is **MIT** (see `NOTICE`). Do n
 
 | Path | Role |
 |------|------|
-| `firmware/Quaverato/Quaverato.ino` | Thin sketch: Tasks, `setup()`, `loop()` |
+| `firmware/Quaverato/Quaverato.ino` | Thin sketch: `setup()`, `loop()` |
 | `firmware/Quaverato/src/` | Modules (oscillator, controls, MIDI, relay, presets, boot, state) |
 | `firmware/Quaverato/sketch.yaml` | Pinned MiniCore + libraries for `arduino-cli --profile` and CI |
 | `firmware/platformio.ini` | Same pins for PlatformIO (open the `firmware/` folder, not the repo root) |
@@ -46,7 +46,7 @@ Target FQBN (must match CI, `sketch.yaml`, Arduino IDE **Tools**, and `docs/gett
 MiniCore:avr:328:clock=16MHz_external,BOD=2v7,LTO=Os_flto,variant=modelP,bootloader=no_bootloader,eeprom=keep
 ```
 
-Pinned libs: TaskScheduler **4.0.8**, MIDI Library **5.0.2**, MiniCore **3.1.3**. EEPROM is the AVR core library.
+Pinned libs: MIDI Library **5.0.2**, MiniCore **3.1.3**. EEPROM is the AVR core library.
 
 `sketch.yaml` must sit next to `Quaverato.ino`, not in `firmware/`, or `--profile` is not found. Profile library names are case-sensitive even though `arduino-cli lib install` is not.
 

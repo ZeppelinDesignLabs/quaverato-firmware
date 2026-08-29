@@ -104,7 +104,6 @@ Use Arduino IDE 1.8 or 2.x. These steps are written for 2.x; 1.8 uses the same *
 
 2. **Tools → Board → Boards Manager**, search **MiniCore**, install **3.1.3**.
 3. **Tools → Manage Libraries** and install:
-   - **TaskScheduler** by Anatoli Arkhipenko, version **4.0.8**
    - **MIDI Library** by Francois Best / Forty Seven Effects, version **5.0.2**
 
 Do not install **EEPROMEx**. This firmware uses the AVR core `EEPROM` library.
@@ -215,5 +214,4 @@ Then play through it: engage, tap tempo, sweep Rate / Depth / Harmonic Mix. Cali
 | Version blink does not match the hex you flashed | Confirm the file name and that avrdude reported `avrdude done. Thank you.` without a verify error. |
 | Lost presets | Restore your `my-presets.hex` backup, or flash `eeprom/quaverato-default-presets.hex`. |
 | `Warning: no eeprom data found in Intel Hex file … Quaverato.ino.eep` | Harmless. The sketch has no EEPROM image to burn, so avrdude skips that file and leaves existing presets alone. |
-| `_TASK_MICRO_RES` redefined | Harmless PlatformIO warning if a stale `-D_TASK_MICRO_RES` is in `platformio.ini`. The sketch already defines it. The build still succeeds. |
 | PlatformIO **Upload** says success (or verify mismatch) and the pedal is dead | PIO’s Upload adds avrdude `-D` (no erase). Leftover bits from the previous firmware stay. `platformio.ini` must pass `-e`. Recover with Arduino IDE **Upload Using Programmer**. Do not add `-V` to hide a verify failure. |

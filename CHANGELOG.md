@@ -4,6 +4,11 @@ All notable firmware changes are documented here.
 
 ## [Unreleased]
 
+### Changed
+- Removed TaskScheduler. The LFO steps from the Timer1 overflow interrupt (same one-step-per-interval
+  behaviour, not DDS yet). Controls, MIDI, relay delays and preset-save live in `loop()` with
+  `micros()` deadlines. `analogRead()` no longer shares a cooperative queue with the oscillator.
+
 ## [2.5.1] — re-opensourced modular tree
 
 Quaverato firmware was open source, then the repository went private (sources still went out

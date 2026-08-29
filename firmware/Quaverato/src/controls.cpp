@@ -6,10 +6,19 @@
 
 #include "pins.h"
 #include "state.h"
-#include "tasks.h"
 #include "oscillator.h"
 #include "relay.h"
 #include "presets.h"
+
+void serviceControls() {
+  static unsigned long last = 0;
+  const unsigned long now = micros();
+  if (now - last < 4000) {
+    return;
+  }
+  last = now;
+  functionSwitch();
+}
 
 static byte safeLogDepth(int value) {
   if (value <= 0) {
@@ -96,12 +105,12 @@ void bypassSwitch() {
   if (switchMode && !presetModeFlag) {
     if (digitalRead(switch_pin_Bypass) == LOW && !pushed) {
       pushed = true;
-      storePreset.enableDelayed(5000000);
+      armPresetStore();
       flipRelay();
     } else if (digitalRead(switch_pin_Bypass) == HIGH && pushed) {
       pushed = false;
       if (!presetModeFlag) {
-        storePreset.disable();
+        cancelPresetStore();
       }
     }
   } else if (momentMode) {

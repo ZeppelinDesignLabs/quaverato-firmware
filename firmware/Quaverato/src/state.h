@@ -8,8 +8,8 @@ extern const int minTapRate;
 extern const int maxTapRate;
 
 extern unsigned long stepRate;
-extern unsigned long firstHalfStepRate;
-extern unsigned long secondHalfStepRate;
+extern volatile unsigned long firstHalfStepRate;
+extern volatile unsigned long secondHalfStepRate;
 extern float dutyCycle;
 
 extern volatile bool relayON;
@@ -18,8 +18,8 @@ extern volatile unsigned long debounceTimer;
 extern volatile unsigned long buttonTimer;
 extern volatile unsigned long tempoTapped;
 
-extern byte currentWaveTable;
-extern byte waveFormStep;
+extern volatile byte currentWaveTable;
+extern volatile byte waveFormStep;
 
 extern byte depth;
 extern double tapDivisor;
@@ -40,7 +40,7 @@ extern bool tableShift;
 extern bool setMidiChannel;
 extern bool midiOmni;
 extern int midiChannel;
-extern bool followMidiClock;
+extern volatile bool followMidiClock;
 extern int clockCount;
 
 extern bool momentMode;

@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+void setupOscillator();
+void enableOscillator();
+void disableOscillator();
 void stepWaveform();
 void light(byte lightIntensity);
 byte adjustLight(int lightIntensity, int mix);

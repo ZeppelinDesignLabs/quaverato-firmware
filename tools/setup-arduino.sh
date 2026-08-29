@@ -20,7 +20,7 @@ arduino-cli core update-index
 
 # Versions must stay in step with firmware/Quaverato/sketch.yaml.
 arduino-cli core install MiniCore:avr@3.1.3
-arduino-cli lib install "TaskScheduler@4.0.8" "MIDI Library@5.0.2"
+arduino-cli lib install "MIDI Library@5.0.2"
 
 echo "=== cores ==="
 arduino-cli core list
