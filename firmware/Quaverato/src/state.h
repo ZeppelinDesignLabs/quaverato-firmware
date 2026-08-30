@@ -25,6 +25,8 @@ extern byte depth;
 extern double tapDivisor;
 extern int floorOne;
 extern int floorTwo;
+// THROW AWAY (try/phase-offset): wavetable index added to the high band (0–255).
+extern volatile byte phaseOffset;
 
 extern int timeDivision;
 

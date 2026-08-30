@@ -20,8 +20,9 @@ volatile byte waveFormStep = 0;
 
 byte depth = 16;
 double tapDivisor = 1;
-int floorOne = 16;
-int floorTwo = 16;
+int floorOne = 32;
+int floorTwo = 32;
+volatile byte phaseOffset = 0;
 
 int timeDivision = 2;
 

@@ -46,7 +46,7 @@ void disableOscillator() {
 }
 
 void stepWaveform() {
-  light(pgm_read_byte_near(waveTable[currentWaveTable] + waveFormStep));
+  light(waveFormStep);
   waveFormStep++;
   if (!followMidiClock || waveFormStep == 0 || waveFormStep == 128) {
     latchIntervalFromStep();
@@ -66,26 +66,19 @@ ISR(TIMER1_OVF_vect) {
   }
 }
 
-void light(byte lightIntensity) {
-  // Continuous LFO invert for stereo (CC35); works without MIDI clock
+void light(byte step) {
+  // THROW AWAY: true delay on the high band, not 255-x inversion.
+  // Low reads table[step]; high reads table[step + phaseOffset].
+  const byte *table = waveTable[currentWaveTable];
+  byte highSample = pgm_read_byte_near(table + (byte)(step + phaseOffset));
+  byte lowSample = pgm_read_byte_near(table + step);
   if (tableShift) {
-    lightIntensity = 255 - lightIntensity;
+    highSample = 255 - highSample;
+    lowSample = 255 - lowSample;
   }
-
-  lightIntensity = lightIntensity < zeroCutoff ? 0 : lightIntensity;
-  byte lightOne = adjustLight(lightIntensity, floorOne);
-  if (!synchronize) {
-    lightIntensity = 255 - lightIntensity;
-  }
-  byte lightTwo = adjustLight(lightIntensity, floorTwo);
-
-  if (floorOne >= floorTwo) {
-    analogWrite(led_pin_TempoLed, lightOne);
-    lightTwo = callibrationMode ? 0 : lightTwo;
-  } else {
-    analogWrite(led_pin_TempoLed, lightTwo);
-    lightOne = callibrationMode ? 0 : lightOne;
-  }
+  byte lightOne = adjustLight(highSample, floorOne);
+  byte lightTwo = adjustLight(lowSample, floorTwo);
+  analogWrite(led_pin_TempoLed, lightOne);
   analogWrite(led_pin_High, lightOne);
   analogWrite(led_pin_Low, lightTwo);
 }
@@ -108,9 +101,8 @@ void setTempo() {
 }
 
 void splitDutyCycle(double duty, unsigned long rate) {
-  if (!synchronize) {
-    rate *= 2;
-  }
+  // THROW AWAY: do not double the period in "harmonic" — PHASE is unused;
+  // the mix knob is the only inter-band relationship.
   const unsigned long first = 2 * rate * duty;
   const unsigned long second = 2 * rate * (1 - duty);
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {

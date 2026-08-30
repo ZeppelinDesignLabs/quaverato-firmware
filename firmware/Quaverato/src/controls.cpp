@@ -202,28 +202,11 @@ void harmonicMixPot() {
 
   int reading = analogRead(pot_pin_HarmonicMix);
   if (reading >= oldReading + 10 || reading <= oldReading - 10) {
-    int harmonicMix = reading;
-    if (harmonicMix <= 450) {
-      floorOne = map(harmonicMix, 450, 0, 100, 0);
-      floorOne = safeLogDepth(floorOne);
-      floorTwo = 32;
-    } else if (harmonicMix >= 550) {
-      floorOne = 32;
-      floorTwo = map(harmonicMix, 550, 1023, 100, 0);
-      floorTwo = safeLogDepth(floorTwo);
-    } else {
-      floorOne = 32;
-      floorTwo = 32;
-    }
-    zeroCutoff = abs(floorOne - floorTwo);
-    if (callibrationMode) {
-      if (floorOne != 32) {
-        floorOne = 0;
-      }
-      if (floorTwo != 32) {
-        floorTwo = 0;
-      }
-    }
+    // THROW AWAY: both bands stay full; the knob is 0–360° of high-side offset.
+    floorOne = 32;
+    floorTwo = 32;
+    zeroCutoff = 0;
+    phaseOffset = (byte)map(reading, 0, 1023, 0, 255);
     expressionSelect = 26;
     oldReading = reading;
   }

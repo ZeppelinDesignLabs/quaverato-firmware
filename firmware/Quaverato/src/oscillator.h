@@ -7,7 +7,7 @@ void setupOscillator();
 void enableOscillator();
 void disableOscillator();
 void stepWaveform();
-void light(byte lightIntensity);
+void light(byte step);
 byte adjustLight(int lightIntensity, int mix);
 
 unsigned long applyTapDivision(unsigned long rate);

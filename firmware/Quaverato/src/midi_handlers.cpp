@@ -96,24 +96,10 @@ void handleControlChange(byte channel, byte number, byte value) {
       setTempo();
       break;
     case 26:
-      if (value > 63) {
-        floorOne = 32;
-        floorTwo = map(value, 64, 127, 100, 0);
-        floorTwo = safeLogDepth(floorTwo);
-      } else {
-        floorOne = map(value, 0, 63, 0, 100);
-        floorOne = safeLogDepth(floorOne);
-        floorTwo = 32;
-      }
-      zeroCutoff = abs(floorOne - floorTwo);
-      if (callibrationMode) {
-        if (floorOne != 32) {
-          floorOne = 0;
-        }
-        if (floorTwo != 32) {
-          floorTwo = 0;
-        }
-      }
+      floorOne = 32;
+      floorTwo = 32;
+      zeroCutoff = 0;
+      phaseOffset = (byte)map(value, 0, 127, 0, 255);
       break;
     case 27:
       if (value > 63) {
